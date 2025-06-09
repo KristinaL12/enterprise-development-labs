@@ -1,0 +1,51 @@
+﻿@page "/supply-stats"
+@inject HttpClient Http
+
+<summary>
+    компонент для отображения поставок, берет данные с api и отображает их в виде таблицы
+</summary>
+
+<h3>Поставки: товары и организации</h3>
+
+@if (stats == null)
+{
+    <p>Загрузка...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Товар</th>
+                <th>Организация</th>
+                <th>Объем поставки</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in stats)
+            {
+                <tr>
+                    <td>@s.productName</td>
+                    <td>@s.factoryName</td>
+                    <td>@s.quantity</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    List<SupplyStatDto>? stats;
+
+    protected override async Task OnInitializedAsync()
+    {
+        stats = await Http.GetFromJsonAsync<List<SupplyStatDto>>("api/supply/statistics");
+    }
+
+    public class SupplyStatDto
+    {
+        public string productName { get; set; }
+        public string factoryName { get; set; }
+        public int quantity { get; set; }
+    }
+}

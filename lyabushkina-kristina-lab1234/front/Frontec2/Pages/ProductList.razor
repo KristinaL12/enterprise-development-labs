@@ -1,0 +1,48 @@
+﻿@page "/product-list"
+@inject HttpClient Http
+
+<summary>
+    компонент для отображения товаров, берет данные с api и отображает их в виде таблицы
+</summary>
+
+<h3>Продукция (по названию)</h3>
+
+@if (products == null)
+{
+    <p>Загрузка...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Количество</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in products)
+            {
+                <tr>
+                    <td>@product.name</td>
+                    <td>@product.quantity</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<ProductDto>? products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await Http.GetFromJsonAsync<List<ProductDto>>("api/products/ordered");
+    }
+
+    public class ProductDto
+    {
+        public string name { get; set; }
+        public int quantity { get; set; }
+    }
+}

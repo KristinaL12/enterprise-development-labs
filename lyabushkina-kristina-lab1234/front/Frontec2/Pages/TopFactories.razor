@@ -1,0 +1,56 @@
+﻿@page "/top-factories"
+@inject HttpClient Http
+
+<summary>
+    компонент для отображения топ организаций, берет данные с api и отображает их в виде таблицы
+</summary>
+
+<h3>ТОП организаций по объему продукции</h3>
+
+<div class="mb-3">
+    <label>Начало периода:</label>
+    <input type="date" @bind="startDate" />
+    <label>Конец периода:</label>
+    <input type="date" @bind="endDate" />
+    <button class="btn btn-primary" @onclick="LoadData">Загрузить</button>
+</div>
+
+@if (factories == null)
+{
+    <p>Загрузка...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr><th>Организация</th><th>Адрес</th><th>Объем</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var f in factories)
+            {
+                <tr><td>@f.name</td><td>@f.address</td><td>@f.totalQuantity</td></tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    DateTime? startDate;
+    DateTime? endDate;
+    List<FactoryDto>? factories;
+
+    async Task LoadData()
+    {
+        if (startDate != null && endDate != null)
+        {
+            factories = await Http.GetFromJsonAsync<List<FactoryDto>>($"api/factories/top?start={startDate}&end={endDate}");
+        }
+    }
+
+    public class FactoryDto
+    {
+        public string name { get; set; }
+        public string address { get; set; }
+        public int totalQuantity { get; set; }
+    }
+}

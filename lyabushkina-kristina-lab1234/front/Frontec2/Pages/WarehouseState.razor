@@ -1,0 +1,47 @@
+﻿@page "/warehouse-state"
+@inject HttpClient Http
+
+<summary>
+    компонент для отображения загруженности склада, берет данные с api и отображает их в виде таблицы
+</summary>
+
+<h3>Состояние склада</h3>
+
+@if (cells == null)
+{
+    <p>Загрузка...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr><th>Ячейка</th><th>Товар</th><th>Количество</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var c in cells)
+            {
+                <tr>
+                    <td>@c.cellId</td>
+                    <td>@c.productName</td>
+                    <td>@c.quantity</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    List<CellDto>? cells;
+
+    protected override async Task OnInitializedAsync()
+    {
+        cells = await Http.GetFromJsonAsync<List<CellDto>>("api/warehouse/state");
+    }
+
+    public class CellDto
+    {
+        public int cellId { get; set; }
+        public string productName { get; set; }
+        public int quantity { get; set; }
+    }
+}

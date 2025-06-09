@@ -1,0 +1,45 @@
+﻿@page "/product-by-date"
+@inject HttpClient Http
+
+<summary>
+    компонент для отображения товаров по дате и получателю, берет данные с api и отображает их в виде таблицы
+</summary>
+
+<h3>Продукция по дате и получателю</h3>
+
+<input type="date" @bind="selectedDate" />
+<input placeholder="Название организации" @bind="organization" />
+<button class="btn btn-primary" @onclick="GetData">Поиск</button>
+
+@if (products != null)
+{
+    <table class="table">
+        <thead>
+            <tr><th>Название</th><th>Количество</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var p in products)
+            {
+                <tr><td>@p.name</td><td>@p.quantity</td></tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    DateTime? selectedDate;
+    string? organization;
+    List<ProductDto>? products;
+
+    async Task GetData()
+    {
+        var url = $"api/products/by-date?date={selectedDate}&org={organization}";
+        products = await Http.GetFromJsonAsync<List<ProductDto>>(url);
+    }
+
+    public class ProductDto
+    {
+        public string name { get; set; }
+        public int quantity { get; set; }
+    }
+}
